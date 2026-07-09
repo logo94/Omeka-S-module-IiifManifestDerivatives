@@ -86,13 +86,13 @@ class Module extends AbstractModule
 
         $manifest['thumbnail'] = $thumbnail;
 
-        foreach ($manifest['items'] ?? [] as $canvas) {
+        foreach ($manifest['items'] ?? [] as &$canvas) {
             $canvas['thumbnail'] = $thumbnail;
             $canvas['width']     = $width;
             $canvas['height']    = $height;
 
-            foreach ($canvas['items'] ?? [] as $annotationPage) {
-                foreach ($annotationPage['items'] ?? [] as $annotation) {
+            foreach ($canvas['items'] ?? [] as &$annotationPage) {
+                foreach ($annotationPage['items'] ?? [] as &$annotation) {
                     $annotation['body'] = [
                         'id'      => $iiifUrl,
                         'type'    => 'Image',
@@ -102,8 +102,13 @@ class Module extends AbstractModule
                         'service' => $service,
                     ];
                 }
+                unset($annotation);
             }
+            unset($annotationPage);
         }
+        unset($canvas);
+        
+        $event->setParam('manifest', $manifest);
     }
 
     protected function getDcIdentifier($resource): ?string
